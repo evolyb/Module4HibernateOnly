@@ -1,6 +1,5 @@
 package controller;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.customer.ICustomerService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 @Controller
 @RequestMapping("/customers")
 public class CustomerController {
@@ -19,7 +21,9 @@ public class CustomerController {
     @Autowired
     ICustomerService customerService;
 
-    @GetMapping("")
+
+
+    @GetMapping
     public String home(Model model){
         Iterable<Customer> customers = customerService.findAll();
         model.addAttribute("customers",customers);
@@ -56,8 +60,6 @@ public class CustomerController {
     @PostMapping("/edit")
     public String updateCustomer(Customer customer, Model model){
         customerService.save(customer);
-        Iterable<Customer> customers = customerService.findAll();
-        model.addAttribute("customers",customers);
         return "redirect:/customers";
     }
 }

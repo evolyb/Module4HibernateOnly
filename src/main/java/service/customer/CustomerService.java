@@ -7,21 +7,23 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 public class CustomerService implements ICustomerService{
 
     @Autowired
     private SessionFactory sessionFactory;
+    @PersistenceContext
+    EntityManager entityManager;
+
     public Iterable<Customer> findAll() {
-        EntityManager entityManager = sessionFactory.createEntityManager();
         TypedQuery<Customer> query = entityManager.createQuery("SELECT s FROM Customer AS s",Customer.class);
         return query.getResultList();
     }
 
     @Override
     public Customer findById(int id) {
-        EntityManager entityManager = sessionFactory.createEntityManager();
         String queryStr = "SELECT c FROM Customer AS c WHERE c.id = :id";
         TypedQuery<Customer> query = entityManager.createQuery(queryStr, Customer.class);
         query.setParameter("id", id);

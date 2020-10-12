@@ -1,5 +1,6 @@
 package config;
 
+import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -7,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -34,14 +34,15 @@ public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
+
     @Bean
-    ICustomerService customerService(){
+    ICustomerService customerService() {
         return new CustomerService();
     }
 
     // Add SpringResourceTemplateResolver
     @Bean
-    public SpringResourceTemplateResolver templateResolver(){
+    public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
         templateResolver.setPrefix("/WEB-INF/views/");
@@ -52,7 +53,7 @@ public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationCon
 
     // Add TemplateEngine
     @Bean
-    public TemplateEngine templateEngine(){
+    public TemplateEngine templateEngine() {
         TemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
         return templateEngine;
@@ -60,7 +61,7 @@ public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationCon
 
     // Add ThymeleafViewResolver
     @Bean
-    public ThymeleafViewResolver viewResolver(){
+    public ThymeleafViewResolver viewResolver() {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine());
         viewResolver.setCharacterEncoding("UTF-8");
@@ -69,23 +70,28 @@ public class AppConfig extends WebMvcConfigurerAdapter implements ApplicationCon
 
     // Config DataSource
     @Bean
-    public DataSource dataSource(){
+    public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/m4l5cus?useSSL=false");
-        dataSource.setUsername( "root" );
-        dataSource.setPassword( "123456" );
+        dataSource.setUsername("root");
+        dataSource.setPassword("123456");
         return dataSource;
     }
 
     //Add LocalSessionFactoryBean
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {
+    public LocalSessionFactoryBean sessionFactoryBean() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("model");
         sessionFactory.setHibernateProperties(additionalProperties());
         return sessionFactory;
+    }
+
+    @Bean
+    public EntityManager entityManager(EntityManagerFactory entityManagerFactory) {
+        return entityManagerFactory.createEntityManager();
     }
 
     // Config AdditionalProperties
